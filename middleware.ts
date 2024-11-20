@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import getToken from "./lib/client/get-token";
 
 interface Routes {

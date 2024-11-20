@@ -1,6 +1,5 @@
 "use client";
 import Input from "@/components/input";
-import callAPI from "@/lib/client/call-api";
 import Image from "next/image";
 import Link from "next/link";
 import { useActionState } from "react";
