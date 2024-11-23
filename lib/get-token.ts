@@ -7,7 +7,6 @@ export default async function getToken() {
     isPrivate: false,
   });
   const resData = await res.json();
-  console.log("resData", resData);
 
   return resData.accessToken;
 }

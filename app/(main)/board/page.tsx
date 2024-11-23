@@ -1,48 +1,65 @@
 "use client";
 
+import callAPI from "@/lib/call-api";
+import getToken from "@/lib/get-token";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { redirect, usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Board() {
-  //   async function getToken() {
-  //     const res = await callAPI({
-  //       url: `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/refresh`!,
-  //       method: "POST",
-  //       isPrivate: false,
-  //     });
-
-  //     if (res.status === 401) {
-  //     //   alert("The Token was expired. Please sign in again.");
-  //       redirect("/login");
-  //     } else if (res.status === 200) {
-  //       const resData = await res.json();
-  //       return resData.accessToken;
-  //     }
-  //   }
-
-  //   const accessToken = await getToken();
-  //   console.log("accessToken", accessToken);
-
-  //   if (!accessToken) {
-  //     redirect("/");
-  //   }
-
   const router = useRouter();
+  const [accessToken, setAccessToken] = useState<string>("");
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const accessToken = await getToken();
+
+      if (accessToken) {
+        setAccessToken(accessToken);
+        console.log("토큰!!", accessToken);
+      } else {
+        redirect("/login");
+      }
+    };
+
+    fetchToken();
+  }, []);
+
+  useEffect(() => {
+    async function getMyEvents(accessToken: string) {
+      console.log("accessToken", accessToken);
+      const res = await callAPI({
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/event/my`!,
+        method: "GET",
+        isPrivate: true,
+        accessToken,
+      });
+
+      console.log("res", res);
+
+      const resData = await res.json();
+
+      console.log("resData", resData);
+    }
+
+    getMyEvents(accessToken);
+  });
 
   return (
-    <div className="h-full w-full px-32 py-16 flex items-center flex-col gap-12">
-      <div className="h-16 w-full">
+    <div className="h-full w-full flex items-center flex-col gap-8">
+      <div className="w-full flex justify-center h-12">
         <Image
           src="/logo.png"
-          width={300}
-          height={60}
+          width={240}
+          height={64}
           alt="logo"
+          priority={true}
           className="mr-auto"
         />
       </div>
       <div className="w-full flex flex-row justify-between px-12">
-        <div className="text-4xl font-semibold">My Events</div>
-        <div className="flex flex-row justify-between items-center w-28">
+        <div className="text-3xl font-semibold">My Events</div>
+        <div className="flex flex-row justify-between items-center gap-5">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -77,14 +94,29 @@ export default function Board() {
               d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
             />
           </svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            className="size-9 cursor-pointer"
+          >
+            <path
+              fillRule="evenodd"
+              d="M15 8A7 7 0 1 1 1 8a7 7 0 0 1 14 0Zm-5-2a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM8 9c-1.825 0-3.422.977-4.295 2.437A5.49 5.49 0 0 0 8 13.5a5.49 5.49 0 0 0 4.294-2.063A4.997 4.997 0 0 0 8 9Z"
+              clipRule="evenodd"
+            />
+          </svg>
         </div>
       </div>
-      <div className="flex flex-col w-full h-2/3 py-12 px-12 rounded-lg bg-neutral-100">
-        <div className="space-y-8 overflow-y-scroll">
+      <div className="flex flex-col w-full h-4/5 py-12 px-12 rounded-lg bg-neutral-100">
+        <div className="space-y-5 overflow-y-scroll">
           {[1, 1, 1, 1, 1, 1, 1, 1].map((item, idx) => (
             <div
               key={idx}
-              className="w-full bg-neutral-200 rounded-lg h-24 px-6 flex flex-row justify-between items-center"
+              className="w-full bg-neutral-200 cursor-pointer rounded-lg h-20 px-6 flex flex-row justify-between items-center"
+              onClick={() => {
+                router.push(`/event/${idx}`);
+              }}
             >
               <div className="flex flex-col ">
                 <span className="text-2xl font-semibold">Event title</span>

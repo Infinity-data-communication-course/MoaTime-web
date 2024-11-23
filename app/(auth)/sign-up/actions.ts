@@ -5,7 +5,7 @@ import {
 } from "@/lib/constants";
 import { z } from "zod";
 import { redirect } from "next/navigation";
-import callAPI from "@/lib/client/call-api";
+import callAPI from "@/lib/call-api";
 
 const checkPasswords = ({
   password,
@@ -53,7 +53,8 @@ const formSchema = z
     path: ["confirm_password"],
   });
 
-export async function createAccount(prevState: any, formData: FormData) {  //eslint-disable-line
+export async function createAccount(prevState: any, formData: FormData) {
+  //eslint-disable-line
   const data = {
     username: formData.get("username"),
     email: formData.get("email"),

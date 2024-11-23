@@ -14,7 +14,13 @@ export default function LogIn() {
   return (
     <div className="h-full w-full flex justify-center items-center flex-col gap-8">
       <div>
-        <Image src="/logo.png" width={300} height={60} alt="logo" />
+        <Image
+          src="/logo.png"
+          width={300}
+          height={60}
+          alt="logo"
+          priority={true}
+        />
       </div>
       <div className="flex justify-center items-center flex-col space-y-4">
         <form action={dispatch} className="flex flex-col gap-3 w-full px-4">

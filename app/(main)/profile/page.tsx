@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 
-export default function Event() {
+export default function Profile() {
   const router = useRouter();
 
   return (

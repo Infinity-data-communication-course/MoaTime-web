@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { redirect } from "next/navigation";
-import callAPI from "@/lib/client/call-api";
+import callAPI from "@/lib/call-api";
 
 const formSchema = z.object({
   email: z.string().email().toLowerCase(),
@@ -9,7 +9,8 @@ const formSchema = z.object({
   }),
 });
 
-export async function logIn(prevState: any, formData: FormData) {  //eslint-disable-line
+export async function logIn(prevState: any, formData: FormData) {
+  //eslint-disable-line
   const data = {
     email: formData.get("email"),
     password: formData.get("password"),

@@ -10,8 +10,8 @@ export default function MailBox() {
   );
 
   return (
-    <div className="h-full w-full px-32 py-16 flex items-center flex-col gap-12">
-      <div className="h-16 w-full">
+    <div className="h-full w-full flex items-center flex-col gap-8">
+      <div className="w-full">
         <svg
           data-slot="icon"
           fill="none"
@@ -20,7 +20,7 @@ export default function MailBox() {
           viewBox="0 0 24 24"
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden="true"
-          className="mr-auto cursor-pointer size-10"
+          className="mr-auto cursor-pointer size-12"
           onClick={() => {
             router.back();
           }}
@@ -33,9 +33,9 @@ export default function MailBox() {
         </svg>
       </div>
       <div className="w-full px-12">
-        <div className="text-4xl font-semibold">Mail Box</div>
+        <div className="text-3xl font-semibold">Mail Box</div>
       </div>
-      <div className="flex flex-col w-full h-2/3 pb-12 pt-6 px-12 rounded-lg bg-neutral-100 gap-6">
+      <div className="flex flex-col w-full h-4/5 pb-12 pt-6 px-12 rounded-lg bg-neutral-100 gap-6">
         <div className="flex flex-row space-x-4 *:rounded-lg *:cursor-pointer *:px-3 *:py-1 *:text-gray-700">
           <div
             className={`${
@@ -68,11 +68,11 @@ export default function MailBox() {
             Refused
           </div>
         </div>
-        <div className="space-y-8 overflow-y-scroll">
+        <div className="space-y-5 overflow-y-scroll">
           {[1, 1, 1, 1, 1, 1, 1, 1].map((item, idx) => (
             <div
               key={idx}
-              className="w-full bg-neutral-200 rounded-lg h-24 px-6 flex flex-row justify-between items-center"
+              className="w-full bg-neutral-200 rounded-lg h-20 px-6 flex flex-row justify-between items-center"
             >
               <div className="flex flex-col ">
                 <span className="text-2xl font-semibold">Event title</span>
