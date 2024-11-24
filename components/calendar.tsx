@@ -11,35 +11,28 @@ export default function MultiDatePicker({
   selectedDates,
   setSelectedDates,
 }: CalendarProps) {
-  // 선택한 날짜들을 관리하는 상태
-  //   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
-
-  // 날짜 클릭 핸들러
   const handleDateClick = (date: Date) => {
     const isSelected = selectedDates.some(
       (selectedDate) => selectedDate.toDateString() === date.toDateString()
     );
 
     if (isSelected) {
-      // 이미 선택된 날짜를 클릭하면 해당 날짜 제거
       setSelectedDates(
         selectedDates.filter(
           (selectedDate) => selectedDate.toDateString() !== date.toDateString()
         )
       );
     } else {
-      // 선택되지 않은 날짜를 클릭하면 추가
       setSelectedDates([...selectedDates, date]);
     }
   };
 
-  // 선택된 날짜에 스타일 적용
   const tileClassName = ({ date, view }: { date: Date; view: string }) => {
     if (view === "month") {
       return selectedDates.some(
         (selectedDate) => selectedDate.toDateString() === date.toDateString()
       )
-        ? "selected-date" // 선택된 날짜에 CSS 클래스 추가
+        ? "selected-date" 
         : "";
     }
     return null;

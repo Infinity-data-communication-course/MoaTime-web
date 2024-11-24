@@ -81,7 +81,6 @@ export default function CreateEvent() {
               <div className="text-lg font-semibold">No earlier than</div>
               <select
                 className="w-28 py-1.5 rounded-lg border-2 cursor-pointer"
-                // value={startTime}
                 onChange={(e) => setStartTime(e.target.selectedIndex)}
               >
                 <option>12:00 AM</option>
@@ -112,7 +111,6 @@ export default function CreateEvent() {
               <div className="text-lg font-semibold">No later than</div>
               <select
                 className="w-28 py-1.5 rounded-lg border-2 cursor-pointer"
-                // value={endTime}
                 onChange={(e) => setEndTime(e.target.selectedIndex)}
               >
                 <option>12:00 AM</option>
