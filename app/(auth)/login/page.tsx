@@ -12,7 +12,7 @@ export default function LogIn() {
   const [state, dispatch] = useActionState(logIn, null);
 
   return (
-    <div className="h-full w-full flex justify-center items-center flex-col gap-8">
+    <div className="h-full w-full flex justify-center items-center flex-col gap-8 my-auto">
       <div>
         <Image
           src="/logo.png"

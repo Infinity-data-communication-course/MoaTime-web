@@ -9,8 +9,7 @@ const formSchema = z.object({
   }),
 });
 
-export async function logIn(prevState: any, formData: FormData) {
-  //eslint-disable-line
+export async function logIn(prevState: any, formData: FormData) { //eslint-disable-line
   const data = {
     email: formData.get("email"),
     password: formData.get("password"),
@@ -28,9 +27,9 @@ export async function logIn(prevState: any, formData: FormData) {
       },
       isPrivate: false,
     });
-    console.log("res", res);
+
     const resData = await res.json();
-    console.log("resData", resData);
+
 
     if (resData.statusCode === 404) {
       return {

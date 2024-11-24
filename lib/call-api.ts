@@ -17,7 +17,7 @@ export default async function callAPI({
     body: JSON.stringify(body),
     headers: {
       "Content-Type": "application/json",
-      Authorization: isPrivate ? `Bearer: ${accessToken}` : "",
+      Authorization: isPrivate ? `Bearer ${accessToken}` : "",
     },
   });
   return res;

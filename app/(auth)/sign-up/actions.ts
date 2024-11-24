@@ -53,8 +53,7 @@ const formSchema = z
     path: ["confirm_password"],
   });
 
-export async function createAccount(prevState: any, formData: FormData) {
-  //eslint-disable-line
+export async function createAccount(prevState: any, formData: FormData) { //eslint-disable-line
   const data = {
     username: formData.get("username"),
     email: formData.get("email"),
@@ -63,7 +62,7 @@ export async function createAccount(prevState: any, formData: FormData) {
   };
   const result = await formSchema.spa(data);
   if (!result.success) {
-    console.log(result.error.flatten());
+
     return result.error.flatten();
   } else {
     const res = await callAPI({
