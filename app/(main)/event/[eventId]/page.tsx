@@ -22,14 +22,12 @@ export default function Event() {
       const accessToken = await getToken();
 
       async function geteventDetail(accessToken: string, eventId: number) {
-        return await (
-          await callAPI({
-            url: `${process.env.NEXT_PUBLIC_SERVER_URL}/event/${eventId}/detail`!,
-            method: "GET",
-            isPrivate: true,
-            accessToken,
-          })
-        ).json();
+        return callAPI({
+          url: `${process.env.NEXT_PUBLIC_SERVER_URL}/event/${eventId}/detail`!,
+          method: "GET",
+          isPrivate: true,
+          accessToken,
+        });
       }
 
       async function getMyId(accessToken: string) {
@@ -54,19 +52,26 @@ export default function Event() {
         if (match) {
           const eventId = +match[1];
           const res = await geteventDetail(accessToken, eventId);
+          const data = await res.json();
 
-          if (res.statusCode === 404) {
+          if (res.status === 404) {
             alert("The event does not exist.");
             router.push("/board");
-          } else if (res.statusCode === 403) {
+          } else if (res.status === 403) {
             alert("Only participating users can check the event in detail.");
             router.push("/board");
           } else {
-            setEventDetail(res);
+            for (let i = 0; i < data.dates.length - 1; i++) {
+              data.dates[i] = new Date(data.dates[i]);
+            }
+
+            data.dates.sort((a: Date, b: Date) => a.valueOf() - b.valueOf());
+
+            setEventDetail(data);
           }
 
           const timeArray = [];
-          for (let i = res.startTime; i < res.endTime; i++) {
+          for (let i = data.startTime; i < data.endTime; i++) {
             timeArray.push(i);
           }
           setTimes(timeArray);
