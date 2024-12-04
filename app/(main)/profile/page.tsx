@@ -142,9 +142,10 @@ export default function Profile() {
           <button
             className="px-3 py-1 rounded-lg bg-neutral-300 font-semibold"
             onClick={async () => {
-              alert("Are you sure you want to log out?");
-              await deleteCookie("refreshToken");
-              redirect("/login");
+              if (confirm("Are you sure you want to log out?")) {
+                await deleteCookie("refreshToken");
+                redirect("/login");
+              }
             }}
           >
             Log out
