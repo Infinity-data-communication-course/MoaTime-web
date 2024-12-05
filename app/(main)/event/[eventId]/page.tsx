@@ -16,6 +16,15 @@ export default function Event() {
   const [times, setTimes] = useState<number[]>([]);
   const [email, setEmail] = useState<string>("");
   const [inviteError, setInviteError] = useState<string>("");
+  
+
+  type AvailableTime = {
+    date: string; // ISO 문자열
+    startTime: number;
+    endTime: number;
+  };
+  
+  
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -90,7 +99,7 @@ export default function Event() {
   const [selectedSlots, setSelectedSlots] = useState<{ [key: string]: boolean }>({});
   const [isDragging, setIsDragging] = useState(false);
   
-  const handleMouseDown = (date: string, time: number) => {
+  const handleMouseDown = (date: Date, time: number) => {
     const slotKey = `${date}-${time}`; // key
     setIsDragging(true);
     setSelectedSlots((prev) => ({
@@ -99,7 +108,7 @@ export default function Event() {
     }));
   };
   
-  const handleMouseEnter = (date: string, time: number) => {
+  const handleMouseEnter = (date: Date, time: number) => {
     if (isDragging) {
       const slotKey = `${date}-${time}`;
       setSelectedSlots((prev) => ({
@@ -108,10 +117,61 @@ export default function Event() {
       }));
     }
   };
+
   
-  const handleMouseUp = () => {
-    setIsDragging(false);
+  const transformSelectedSlotsToPayload = (slots: { [key: string]: boolean }): AvailableTime[] => {
+    const groupedByDate: { [key: string]: number[] } = {};
+  
+    Object.entries(slots).forEach(([key, value]) => {
+      if (value) {
+        const [date, timeSlot] = key.split('-');
+        if (!groupedByDate[date]) groupedByDate[date] = [];
+        groupedByDate[date].push(Number(timeSlot));
+      }
+    });
+  
+    const availableTimes: AvailableTime[] = [];
+    Object.entries(groupedByDate).forEach(([date, times]) => {
+      times.sort((a, b) => a - b);
+      let startTime = times[0];
+      for (let i = 1; i <= times.length; i++) {
+        if (i === times.length || times[i] !== times[i - 1] + 1) {
+          availableTimes.push({
+            date: new Date(date).toISOString(),
+            startTime,
+            endTime: times[i - 1] + 1,
+          });
+          startTime = times[i];
+        }
+      }
+    });
+  
+    return availableTimes;
   };
+  
+  const handleMouseUp = async () => {
+    setIsDragging(false);
+  
+    const transformedData = transformSelectedSlotsToPayload(selectedSlots);
+  
+    const accessToken = await getToken();
+  
+    try {
+      const response = await callAPI({
+        url: `${process.env.NEXT_PUBLIC_SERVER_URL}/event/${eventDetail!.id}/available-time`,
+        method: "POST",
+        body: { availableTimes: transformedData },
+        isPrivate: true,
+        accessToken,
+      });
+  
+      console.log("가능 시간이 성공적으로 업데이트되었습니다:", response);
+    } catch (error) {
+      console.error("가능 시간 업데이트 중 오류 발생:", error);
+    }
+  };
+  
+  
   
   
   useEffect(() => {
@@ -219,7 +279,7 @@ export default function Event() {
               </div>
               <div className="flex flex-row overflow-x-scroll">
                 {eventDetail?.dates.map((d, dateIdx) => {
-                  const date = new Date(d).toISOString().split("T")[0]; // 날짜를 'YYYY-MM-DD' 형식으로
+                  const date = new Date(d); // 날짜를 'YYYY-MM-DD' 형식으로
                   return (
                     <div key={dateIdx} className="flex flex-col">
                       <div className="h-12 w-11 text-center select-none">
