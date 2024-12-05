@@ -87,6 +87,44 @@ export default function Event() {
     fetchToken();
   }, [pathname, router]);
 
+  const [selectedSlots, setSelectedSlots] = useState<{ [key: string]: boolean }>({});
+  const [isDragging, setIsDragging] = useState(false);
+  
+  const handleMouseDown = (date: string, time: number) => {
+    const slotKey = `${date}-${time}`; // key
+    setIsDragging(true);
+    setSelectedSlots((prev) => ({
+      ...prev,
+      [slotKey]: !prev[slotKey], // reverse current state
+    }));
+  };
+  
+  const handleMouseEnter = (date: string, time: number) => {
+    if (isDragging) {
+      const slotKey = `${date}-${time}`;
+      setSelectedSlots((prev) => ({
+        ...prev,
+        [slotKey]: !prev[slotKey],
+      }));
+    }
+  };
+  
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+  
+  
+  useEffect(() => {
+    const handleDocumentMouseUp = () => {
+      setIsDragging(false);
+    };
+  
+    document.addEventListener("mouseup", handleDocumentMouseUp);
+    return () => {
+      document.removeEventListener("mouseup", handleDocumentMouseUp);
+    };
+  }, []);
+  
   return (
     <div className="h-full w-full flex items-center flex-col gap-8">
       <div className="w-full">
@@ -171,7 +209,7 @@ export default function Event() {
           <div className="flex-1 space-y-2 w-1/2">
             <div className="text-xl font-semibold">Your schedule</div>
             <div className="flex flex-row">
-              <div className="flex flex-col text-right w-16 text-sm">
+              <div className="flex flex-col text-right w-16 text-sm select-none">
                 <div className="h-12" />
                 {times.map((time, idx) => (
                   <div key={idx} className="h-10 pr-1">{`${time} ${
@@ -180,22 +218,28 @@ export default function Event() {
                 ))}
               </div>
               <div className="flex flex-row overflow-x-scroll">
-                {eventDetail?.dates.map((d, idx) => {
-                  const date = new Date(d);
-
+                {eventDetail?.dates.map((d, dateIdx) => {
+                  const date = new Date(d).toISOString().split("T")[0]; // 날짜를 'YYYY-MM-DD' 형식으로
                   return (
-                    <div key={idx} className="flex flex-col">
-                      <div className="h-12 w-11 *:text-center">
+                    <div key={dateIdx} className="flex flex-col">
+                      <div className="h-12 w-11 text-center select-none">
                         <div className="text-sm">
-                          {`${date
-                            .toLocaleString("default", { month: "long" })
-                            .slice(0, 3)}`}
+                          {new Date(d).toLocaleString("default", { month: "long" }).slice(0, 3)}
                         </div>
-                        <div className="text-lg">{`${date.getDate()}`}</div>
+                        <div className="text-lg">{new Date(d).getDate()}</div>
                       </div>
-                      {times.map((time, idx) => (
-                        <div key={idx} className="h-10 border-2" />
-                      ))}
+                      {times.map((time, timeIdx) => {
+                        const slotKey = `${date}-${time}`;
+                        return (
+                          <div
+                            key={timeIdx}
+                            className={`h-10 border-2 ${selectedSlots[slotKey] ? "bg-green-300" : ""}`}
+                            onMouseDown={() => handleMouseDown(date, time)}
+                            onMouseUp={handleMouseUp}
+                            onMouseEnter={() => handleMouseEnter(date, time)}
+                          />
+                        );
+                      })}
                     </div>
                   );
                 })}
