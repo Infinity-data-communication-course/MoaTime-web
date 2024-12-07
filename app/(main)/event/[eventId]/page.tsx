@@ -105,11 +105,11 @@ export default function Event() {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleMouseDown = (date: string, time: number) => {
-    const slotKey = `${date}-${time}`; // key
+    const slotKey = `${date}-${time}`; 
     setIsDragging(true);
     setSelectedSlots((prev) => ({
       ...prev,
-      [slotKey]: !prev[slotKey], // reverse current state
+      [slotKey]: !prev[slotKey], 
     }));
   };
 
