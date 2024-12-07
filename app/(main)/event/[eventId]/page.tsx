@@ -105,11 +105,11 @@ export default function Event() {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleMouseDown = (date: string, time: number) => {
-    const slotKey = `${date}-${time}`; 
+    const slotKey = `${date}-${time}`;
     setIsDragging(true);
     setSelectedSlots((prev) => ({
       ...prev,
-      [slotKey]: !prev[slotKey], 
+      [slotKey]: !prev[slotKey],
     }));
   };
 
@@ -127,7 +127,7 @@ export default function Event() {
     setIsDragging(false);
 
     const filtered = Object.entries(selectedSlots).filter(
-      ([key, value]) => value === true
+      (slot) => slot[1] === true
     );
 
     const timeObjects = filtered.map((timeObject) => {
