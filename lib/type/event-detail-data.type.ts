@@ -10,8 +10,21 @@ export type EventDetailData = {
     userId: number;
     userName: string;
     availableTimes: {
-      startTime: Date;
-      endTime: Date;
+      date: Date;
+      startTime: number;
+      endTime: number;
     }[];
   }[];
+};
+
+export type AvailableTime = {
+  date: Date;
+  startTime: number;
+  endTime: number;
+};
+
+export type eventJoin = {
+  userId: number;
+  userName: string;
+  availableTimes: AvailableTime[];
 };
