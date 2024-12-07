@@ -2,7 +2,7 @@
 
 import callAPI from "@/lib/call-api";
 import getToken from "@/lib/get-token";
-import { EventDetailData } from "@/lib/type/event-detail-data.type";
+import { EventDetailData, eventJoin } from "@/lib/type/event-detail-data.type";
 import { redirect, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -68,6 +68,18 @@ export default function Event() {
             data.dates.sort((a: Date, b: Date) => a.valueOf() - b.valueOf());
 
             setEventDetail(data);
+
+            data.eventJoins.map((eventJoin: eventJoin) => {
+              if (eventJoin.userId === idRes.id) {
+                const slotKeys = eventJoin.availableTimes.map(
+                  (availableTime) =>
+                    `${new Date(availableTime.date)}-${availableTime.startTime}`
+                );
+                slotKeys.map((slotKey: string) =>
+                  setSelectedSlots((prev) => ({ ...prev, [slotKey]: true }))
+                );
+              }
+            });
           }
 
           const timeArray = [];
@@ -87,9 +99,11 @@ export default function Event() {
     fetchToken();
   }, [pathname, router]);
 
-  const [selectedSlots, setSelectedSlots] = useState<{ [key: string]: boolean }>({});
+  const [selectedSlots, setSelectedSlots] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [isDragging, setIsDragging] = useState(false);
-  
+
   const handleMouseDown = (date: string, time: number) => {
     const slotKey = `${date}-${time}`; // key
     setIsDragging(true);
@@ -98,7 +112,7 @@ export default function Event() {
       [slotKey]: !prev[slotKey], // reverse current state
     }));
   };
-  
+
   const handleMouseEnter = (date: string, time: number) => {
     if (isDragging) {
       const slotKey = `${date}-${time}`;
@@ -108,23 +122,42 @@ export default function Event() {
       }));
     }
   };
-  
-  const handleMouseUp = () => {
+
+  const handleMouseUp = async () => {
     setIsDragging(false);
+
+    const filtered = Object.entries(selectedSlots).filter(
+      ([key, value]) => value === true
+    );
+
+    const timeObjects = filtered.map((timeObject) => {
+      const [date, time] = timeObject[0].split("-");
+
+      return { date, startTime: parseInt(time), endTime: parseInt(time) + 1 };
+    });
+
+    await callAPI({
+      url: `${process.env.NEXT_PUBLIC_SERVER_URL}/event/${eventDetail?.id}/available-time`!,
+      method: "POST",
+      body: {
+        availableTimes: timeObjects,
+      },
+      isPrivate: true,
+      accessToken: token,
+    });
   };
-  
-  
+
   useEffect(() => {
     const handleDocumentMouseUp = () => {
       setIsDragging(false);
     };
-  
+
     document.addEventListener("mouseup", handleDocumentMouseUp);
     return () => {
       document.removeEventListener("mouseup", handleDocumentMouseUp);
     };
   }, []);
-  
+
   return (
     <div className="h-full w-full flex items-center flex-col gap-8">
       <div className="w-full">
@@ -219,24 +252,27 @@ export default function Event() {
               </div>
               <div className="flex flex-row overflow-x-scroll">
                 {eventDetail?.dates.map((d, dateIdx) => {
-                  const date = new Date(d).toISOString().split("T")[0]; // 날짜를 'YYYY-MM-DD' 형식으로
                   return (
                     <div key={dateIdx} className="flex flex-col">
                       <div className="h-12 w-11 text-center select-none">
                         <div className="text-sm">
-                          {new Date(d).toLocaleString("default", { month: "long" }).slice(0, 3)}
+                          {new Date(d)
+                            .toLocaleString("default", { month: "long" })
+                            .slice(0, 3)}
                         </div>
                         <div className="text-lg">{new Date(d).getDate()}</div>
                       </div>
                       {times.map((time, timeIdx) => {
-                        const slotKey = `${date}-${time}`;
+                        const slotKey = `${d}-${time}`;
                         return (
                           <div
                             key={timeIdx}
-                            className={`h-10 border-2 ${selectedSlots[slotKey] ? "bg-green-300" : ""}`}
-                            onMouseDown={() => handleMouseDown(date, time)}
+                            className={`h-10 border-2 ${
+                              selectedSlots[slotKey] ? "bg-green-300" : ""
+                            }`}
+                            onMouseDown={() => handleMouseDown(d, time)}
                             onMouseUp={handleMouseUp}
-                            onMouseEnter={() => handleMouseEnter(date, time)}
+                            onMouseEnter={() => handleMouseEnter(d, time)}
                           />
                         );
                       })}
@@ -271,9 +307,17 @@ export default function Event() {
                         </div>
                         <div className="text-lg">{`${date.getDate()}`}</div>
                       </div>
-                      {times.map((time, idx) => (
-                        <div key={idx} className="h-10 border-2" />
-                      ))}
+                      {times.map((time, idx) => {
+                        const slotKey = `${d}-${time}`;
+                        return (
+                          <div
+                            key={idx}
+                            className={`h-10 border-2 ${
+                              selectedSlots[slotKey] ? "bg-green-300" : ""
+                            }`}
+                          />
+                        );
+                      })}
                     </div>
                   );
                 })}
